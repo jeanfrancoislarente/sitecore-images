@@ -12,7 +12,12 @@ function Invoke-PackageRestore
         [string]$Destination
         ,
         [Parameter(Mandatory = $false)]
-        [array]$Tags = @("*"),
+        [array]$Tags = @("*")
+        ,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Include", "Skip")]
+        [string]$DeprecatedTagsBehavior = "Skip"
+        ,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$SitecoreUsername
@@ -40,7 +45,7 @@ function Invoke-PackageRestore
 
     # Find out which files is needed
     $downloadSession = $null
-    $specs = Initialize-BuildSpecifications -Specifications (Get-BuildSpecifications -Path $Path) -InstallSourcePath $Destination -Tags $Tags -ImplicitTagsBehavior "Include"
+    $specs = Initialize-BuildSpecifications -Specifications (Get-BuildSpecifications -Path $Path) -InstallSourcePath $Destination -Tags $Tags -ImplicitTagsBehavior "Include" -DeprecatedTagsBehavior $DeprecatedTagsBehavior
     $expected = $specs | Where-Object { $_.Include -and $_.Sources.Length -gt 0 } | Select-Object -ExpandProperty Sources -Unique
     
     # Check or download needed files
@@ -130,6 +135,10 @@ function Invoke-Build
         [string]$ImplicitTagsBehavior = "Include"
         ,
         [Parameter(Mandatory = $false)]
+        [ValidateSet("Include", "Skip")]
+        [string]$DeprecatedTagsBehavior = "Skip"
+        ,
+        [Parameter(Mandatory = $false)]
         [ValidateSet("WhenChanged", "Always", "Never")]
         [string]$PushMode = "WhenChanged"
         ,
@@ -143,7 +152,7 @@ function Invoke-Build
     $ProgressPreference = "SilentlyContinue"
 
     # Find out what to build
-    $specs = Initialize-BuildSpecifications -Specifications (Get-BuildSpecifications -Path $Path) -InstallSourcePath $InstallSourcePath -Tags $Tags -ImplicitTagsBehavior $ImplicitTagsBehavior
+    $specs = Initialize-BuildSpecifications -Specifications (Get-BuildSpecifications -Path $Path) -InstallSourcePath $InstallSourcePath -Tags $Tags -ImplicitTagsBehavior $ImplicitTagsBehavior -DeprecatedTagsBehavior $DeprecatedTagsBehavior
 
     # Print results
     $specs | Select-Object -Property Tag, Include, Deprecated, Priority, Base | Format-Table
@@ -215,17 +224,18 @@ function Invoke-Build
             }
         
             # Build image
-            if ($tag -like "*sql*")
-            {
-                # Building SQL based images needs more memory than the default 2GB...
-                docker image build --isolation "hyperv" --memory 4GB --tag $tag $spec.Path
-            }
-            else
-            {
-                docker image build --isolation "hyperv" --tag $tag $spec.Path 
-            }
+            $buildOptions = New-Object System.Collections.Generic.List[System.Object]
+            $buildOptions.Add("--isolation 'hyperv'")
+            $buildOptions.Add("--tag '$tag'")
+            $buildOptions.AddRange($spec.BuildOptions)
+        
+            $buildCommand = "docker image build {0} '{1}'" -f ($buildOptions -join " "), $spec.Path
+        
+            Write-Verbose ("Invoking: {0} " -f $buildCommand) -Verbose:$VerbosePreference
 
-            $LASTEXITCODE -ne 0 | Where-Object { $_ } | ForEach-Object { throw "Failed." }
+            & ([scriptblock]::create($buildCommand))
+        
+            $LASTEXITCODE -ne 0 | Where-Object { $_ } | ForEach-Object { throw "Failed: $buildCommand" }
 
             # Tag image
             $fulltag = "{0}/{1}" -f $Registry, $tag
@@ -279,6 +289,10 @@ function Initialize-BuildSpecifications
         [Parameter(Mandatory = $false)]
         [ValidateSet("Include", "Skip")]
         [string]$ImplicitTagsBehavior = "Include"
+        ,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Include", "Skip")]
+        [string]$DeprecatedTagsBehavior = "Skip"
     )
 
     # Update specs, resolve sources to full path
@@ -297,38 +311,14 @@ function Initialize-BuildSpecifications
     $Specifications | ForEach-Object {
         $spec = $_
 
-        if ($spec.Deprecated)
+        $spec.Include = ($Tags | ForEach-Object { $spec.Tag -like $_ }) -contains $true
+         
+        if ($spec.Include -eq $true -and $spec.Deprecated -eq $true -and $DeprecatedTagsBehavior -eq "Skip")
         {
-            # Only include deprecated specifications when it's explicitly matched
-            $spec.Include = ($Tags | Where-Object { $_ -ne "*" } | ForEach-Object { $spec.Tag -like $_ }) -contains $true
+            $spec.Include = $false
+
+            Write-Verbose ("Tag '{0}' excluded as it is deprecated and the DeprecatedTagsBehavior parameter is '{1}'." -f $spec.Tag, $DeprecatedTagsBehavior)
         }
-        else
-        {
-            $spec.Include = ($Tags | ForEach-Object { $spec.Tag -like $_ }) -contains $true
-        }
-    }
-    
-    # Find base images
-    $Specifications | ForEach-Object {
-        $spec = $_
-
-        $baseImages = Get-Content -Path $spec.DockerFilePath | Where-Object { $_.StartsWith("FROM ") } | ForEach-Object { Write-Output $_.Replace("FROM ", "").Trim() } | ForEach-Object {
-            $image = $_
-
-            if ($image -like "* as *")
-            {
-                $image = $image.Substring(0, $image.IndexOf(" as "))
-            }
-
-            if ([string]::IsNullOrEmpty($image))
-            {
-                throw ("Invalid Dockerfile '{0}', no FROM image was found?" -f $_.FullName)
-            }
-
-            Write-Output $image
-        }
-
-        $spec.Base = @($baseImages)
     }
 
     # Update specs, re-include base images
@@ -357,7 +347,6 @@ function Initialize-BuildSpecifications
             }
         }
     }
-    
 
     # Specify priority for each tag, used to ensure base images are build first. This is the most simple approach I could come up with for handling dependencies between images. If needed in the future, look into something like https://en.wikipedia.org/wiki/Topological_sorting.
     $defaultPriority = 1000
@@ -401,14 +390,11 @@ function Get-BuildSpecifications
     )
 
     Get-ChildItem -Path $Path -Filter "build.json" -Recurse | ForEach-Object {
-        $data = Get-Content -Path $_.FullName | ConvertFrom-Json
-        $dockerFile = Get-Item -Path (Join-Path $_.Directory.FullName "\Dockerfile")
+        $buildContextPath = $_.Directory.FullName
+        $buildFilePath = $_.FullName
+        $data = Get-Content -Path $buildFilePath | ConvertFrom-Json
+        $dockerFile = Get-Item -Path (Join-Path $buildContextPath "\Dockerfile")
         
-        if ([string]::IsNullOrEmpty($data.tag))
-        {
-            throw ("Tag was null or empty in '{0}'." -f $_.FullName)
-        }
-
         $sources = @()
 
         if ($null -ne $data.sources)
@@ -416,23 +402,106 @@ function Get-BuildSpecifications
             $sources = $data.sources
         }
 
-        $deprecated = $false
-
-        if ($null -ne $data.deprecated)
+        $dataTags = $data.tags
+        
+        if ($null -eq $dataTags)
         {
-            $deprecated = [bool]$data.deprecated
+            $dataTags = @()
+
+            # TODO: Removed when all build.json files has been converted to new format
+            if ($null -ne $data.deprecated)
+            {
+                $dataTags += @{ "tag" = $data.tag; "deprecated" = $data.deprecated; }
+            }
+            else
+            {
+                $dataTags += @{ "tag" = $data.tag; }
+            }
         }
 
-        Write-Output (New-Object PSObject -Property @{
-                Tag            = $data.tag;
-                Base           = @();
-                Path           = $_.Directory.FullName;
-                DockerFilePath = $dockerFile.FullName;
-                Sources        = $sources;
-                Priority       = $null;
-                Include        = $false;
-                Deprecated     = $deprecated;
-            })
+        $dockerFileContent = $dockerFile | Get-Content
+        $dockerFileArgLines = $dockerFileContent | Select-String -SimpleMatch "ARG " -CaseSensitive | ForEach-Object { Write-Output $_.ToString().Replace("ARG ", "") }
+        $dockerFileFromLines = $dockerFileContent | Select-String -SimpleMatch "FROM " -CaseSensitive | ForEach-Object { Write-Output $_.ToString().Replace("FROM ", "") }
+        
+        $dataTags | ForEach-Object {
+            $tag = $_
+            $options = $tag.'build-options'
+
+            if ($null -eq $options)
+            {
+                $options = @()
+
+                # TODO: Removed when all build.json files has been converted to new format
+                if ($tag.tag -like "*sql*") 
+                {
+                    $options += "--memory 4GB"
+                }
+            }
+
+            $deprecated = $false
+
+            if ($null -ne $tag.deprecated)
+            {
+                $deprecated = [bool]$tag.deprecated
+            }
+
+            # Find base images...
+            $baseImages = $dockerFileFromLines | ForEach-Object {
+                $image = $_
+
+                if ($image -like "* as *")
+                {
+                    $image = $image.Substring(0, $image.IndexOf(" as "))
+                }
+            
+                if ($image -like "`$*")
+                {
+                    $argName = $image.Replace("`$", "").Replace("{", "").Replace("}", "")
+                    $matchingOption = $options | Where-Object { $_.Contains($argName) } | Select-Object -First 1
+
+                    if ($null -ne $matchingOption)
+                    {
+                        # Resolved base image from ARG passed as build-args defined in build-options
+                        $image = $matchingOption.Substring($matchingOption.IndexOf($argName) + $argName.Length).Replace("=", "")
+                    }
+                    else
+                    {
+                        $argDefaultValue = $dockerFileArgLines | Where-Object { $_ -match $argName } | ForEach-Object {
+                            Write-Output $_.Replace($argName, "").Replace("=", "")
+                        }
+
+                        if ([string]::IsNullOrEmpty($argDefaultValue) -eq $false)
+                        {
+                            # Resolved base image from ARG default value
+                            $image = $argDefaultValue
+                        }
+                        else
+                        {
+                            throw ("Parse error in '{0}', Dockerfile is expecting ARG '{1}' but it has no default value and is not found in any 'build-options'." -f $buildFilePath, $argName)
+                        }
+                    }
+                }
+                
+                Write-Output $image
+            }
+
+            if ($null -eq $baseImages -or $baseImages.Length -eq 0)
+            {
+                throw ("Parse error, no base images was found in Dockerfile '{0}'." -f $dockerFile.FullName)
+            }
+            
+            Write-Output (New-Object PSObject -Property @{
+                    Tag            = $tag.tag;
+                    BuildOptions   = @($options);
+                    Base           = @($baseImages | Select-Object -Unique);
+                    Path           = $buildContextPath;
+                    DockerFilePath = $dockerFile.FullName;
+                    Sources        = @($sources);
+                    Priority       = $null;
+                    Include        = $false;
+                    Deprecated     = $deprecated;
+                })
+        }
     }
 }
 

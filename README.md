@@ -1,15 +1,25 @@
-# Repository of Sitecore Docker base images
+# Repository of Sitecore Docker images
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[//]: # "start: stats"
 
-Build your own Docker images out of every released Sitecore version since 8.2 rev. 170407 (Update 3) - the first version that officially supported Windows Server 2016. There are some older versions too if your interested! See [Current images](#current-images) for an up-to-date list of which base images available and [Current variants](#current-variants) for variants (base images with additional modules installed). You can use this repository (preferably from a fork) from you own build server and have it build and push images to your own private Docker registry. Jump to the [How to use](#how-to-use) section for more details.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) ![Repositories](https://img.shields.io/badge/Repositories-38-blue.svg) ![Tags](https://img.shields.io/badge/Tags-173-blue.svg) ![Deprecated](https://img.shields.io/badge/Deprecated-27-lightgrey.svg) ![Dockerfiles](https://img.shields.io/badge/Dockerfiles-88-blue.svg)
+
+[//]: # "end: stats"
+
+Build your own Docker images for every released Sitecore version since 8.2 rev. 170407 (Update 3). See [Current images](#current-images) for an up-to-date list of which base images available and [Current variants](#current-variants) for variants, base images with additional modules installed such as SXA and JSS. You can use this repository (preferably from a fork) from you own build server and have it build and push images to your own private Docker registry. Jump to the [How to use](#how-to-use) section for more details.
 
 ## Changelog
 
-- [Added] Added CreativeExchange interchange folder to SXA docker-compose file 9.1.1 XM and XP SXA on ltc2019
-- [Deprecated] Sitecore 8.2 rev. 161221 is now marked as deprecated. You can still build it explicitly using `-Tags "*:8.2.161221*"`.
-- [Deprecated] Sitecore 7.5 is now marked as deprecated. You can still build it explicitly using `-Tags "*:7.5*"`.
-- [**Breaking**] Added build / restore support for deprecated images. Images that are deprecated is not build by default anymore, only when explicitly defined in the `Tags` parameter.
+- [Changed] Added multiple release channels (ie ltsc2019, 1903) on variants.
+- [Changed] All SQL images are now based on the `mssql-developer:2017` image.
+- [**Breaking**] To build deprecated image tags, you now need set the `DeprecatedTagsBehavior` parameter to `Include`.
+- [Deprecated] All 1709 images is now deprecated as the [.NET framework is no longer supported on this build](https://github.com/Microsoft/dotnet-framework-docker/issues/259). You can still build them using `-DeprecatedTagsBehavior "Include"`.
+- [Removed] ltsc2016 images is now deleted completely as ltsc2019 is now the current ltsc version.
+- [Fixed] Using `ARG` variables in Docker files can now be with and without `{}`. 
+- [Changed] The `build.json` format has changed to support the use of `build-arg` during `docker image build`. In this new format we can support multiple release channels (ie 1803, ltsc2019, 1903) within a single build folder using `ARG` while reducing maintenance time and disk space needed.
+- [Deprecated] Sitecore 8.2 rev. 161221 is now marked as deprecated. You can still build them using `-DeprecatedTagsBehavior "Include"`.
+- [Deprecated] Sitecore 7.5 is now marked as deprecated. You can still build them using `-DeprecatedTagsBehavior "Include"`.
+- [**Breaking**] Added build / restore support for deprecated images. Images that are deprecated is not build by default anymore, only when setting parameter `-DeprecatedTagsBehavior "Include"`.
 - [Added] Ability to download required packages from dev.sitecore.net, see [How to use](#how-to-use) section for more details. Thanks [@Brad-Christie](https://github.com/Brad-Christie) :+1:
 - [Changed] Implicit tags are now automatically included by default when using the `-Tags` parameter so you don't have to explicit define all dependent tags. Thanks [@Brad-Christie](https://github.com/Brad-Christie) :+1:
 - [Added] Added Sitecore 9.1.1 XM and XP on 1903. Thanks [@jballe](https://github.com/jballe) :+1:
@@ -68,158 +78,195 @@ Build your own Docker images out of every released Sitecore version since 8.2 re
 
 ## Current images
 
+[//]: # "start: current images"
+
 | Version | Repository | OS  | Build      | Tag |
 | ------- | ---------- | --- | -----------| --- |
-| 9.1.1 | sitecore-xp-xconnect-indexworker | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-indexworker:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-xconnect-indexworker/Dockerfile) |
-| 9.1.1 | sitecore-xp-xconnect-automationengine | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-automationengine:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-xconnect-automationengine/Dockerfile) |
-| 9.1.1 | sitecore-xp-xconnect | windowsservercore | ltsc2019 | `sitecore-xp-xconnect:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-xconnect/Dockerfile) |
-| 9.1.1 | sitecore-xp-standalone | windowsservercore | ltsc2019 | `sitecore-xp-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-standalone/Dockerfile) |
-| 9.1.1 | sitecore-xp-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xp-cd | windowsservercore | ltsc2019 | `sitecore-xp-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-cd/Dockerfile) |
-| 9.1.1 | sitecore-xp-base | windowsservercore | ltsc2019 | `sitecore-xp-base:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xp-base/Dockerfile) |
-| 9.1.1 | sitecore-xm1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xm1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xm1-cm/Dockerfile) |
-| 9.1.1 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-xm1-cd/Dockerfile) |
-| 9.1.1 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-ltsc2019/sitecore-base/Dockerfile) |
-| 9.1.1 | sitecore-xp-xconnect-indexworker | windowsservercore | 1903 | `sitecore-xp-xconnect-indexworker:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-xconnect-indexworker/Dockerfile) |
-| 9.1.1 | sitecore-xp-xconnect-automationengine | windowsservercore | 1903 | `sitecore-xp-xconnect-automationengine:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-xconnect-automationengine/Dockerfile) |
-| 9.1.1 | sitecore-xp-xconnect | windowsservercore | 1903 | `sitecore-xp-xconnect:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-xconnect/Dockerfile) |
-| 9.1.1 | sitecore-xp-standalone | windowsservercore | 1903 | `sitecore-xp-standalone:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-standalone/Dockerfile) |
-| 9.1.1 | sitecore-xp-sqldev | windowsservercore | 1903 | `sitecore-xp-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xp-solr | nanoserver | 1903 | `sitecore-xp-solr:9.1.1-nanoserver-1903` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver-1903/sitecore-xp-solr/Dockerfile) |
-| 9.1.1 | sitecore-xp-cd | windowsservercore | 1903 | `sitecore-xp-cd:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-cd/Dockerfile) |
-| 9.1.1 | sitecore-xp-base | windowsservercore | 1903 | `sitecore-xp-base:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xp-base/Dockerfile) |
-| 9.1.1 | sitecore-xm1-sqldev | windowsservercore | 1903 | `sitecore-xm1-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xm1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xm1-solr | nanoserver | 1903 | `sitecore-xm1-solr:9.1.1-nanoserver-1903` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver-1903/sitecore-xm1-solr/Dockerfile) |
-| 9.1.1 | sitecore-xm1-cm | windowsservercore | 1903 | `sitecore-xm1-cm:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xm1-cm/Dockerfile) |
-| 9.1.1 | sitecore-xm1-cd | windowsservercore | 1903 | `sitecore-xm1-cd:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-xm1-cd/Dockerfile) |
-| 9.1.1 | sitecore-base | windowsservercore | 1903 | `sitecore-base:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore-1903/sitecore-base/Dockerfile) |
-| 9.1.1 | sitecore-xp-solr | nanoserver | 1809 | `sitecore-xp-solr:9.1.1-nanoserver-1809` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver-1809/sitecore-xp-solr/Dockerfile) |
-| 9.1.1 | sitecore-xm1-solr | nanoserver | 1809 | `sitecore-xm1-solr:9.1.1-nanoserver-1809` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver-1809/sitecore-xm1-solr/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect-indexworker | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-indexworker:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-xconnect-indexworker/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect-automationengine | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-automationengine:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-xconnect-automationengine/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect | windowsservercore | ltsc2019 | `sitecore-xp-xconnect:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-xconnect/Dockerfile) |
-| 9.1.0 | sitecore-xp-standalone | windowsservercore | ltsc2019 | `sitecore-xp-standalone:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-standalone/Dockerfile) |
-| 9.1.0 | sitecore-xp-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sqldev:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-sqldev/Dockerfile) |
-| 9.1.0 | sitecore-xp-cd | windowsservercore | ltsc2019 | `sitecore-xp-cd:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-cd/Dockerfile) |
-| 9.1.0 | sitecore-xp-base | windowsservercore | ltsc2019 | `sitecore-xp-base:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xp-base/Dockerfile) |
-| 9.1.0 | sitecore-xm1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sqldev:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xm1-sqldev/Dockerfile) |
-| 9.1.0 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xm1-cm/Dockerfile) |
-| 9.1.0 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-xm1-cd/Dockerfile) |
-| 9.1.0 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-ltsc2019/sitecore-base/Dockerfile) |
-| 9.1.0 | sitecore-xp-solr | nanoserver | 1809 | `sitecore-xp-solr:9.1.0-nanoserver-1809` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver-1809/sitecore-xp-solr/Dockerfile) |
-| 9.1.0 | sitecore-xm1-solr | nanoserver | 1809 | `sitecore-xm1-solr:9.1.0-nanoserver-1809` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver-1809/sitecore-xm1-solr/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect-indexworker | windowsservercore | 1803 | `sitecore-xp-xconnect-indexworker:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-xconnect-indexworker/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect-automationengine | windowsservercore | 1803 | `sitecore-xp-xconnect-automationengine:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-xconnect-automationengine/Dockerfile) |
-| 9.1.0 | sitecore-xp-xconnect | windowsservercore | 1803 | `sitecore-xp-xconnect:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-xconnect/Dockerfile) |
-| 9.1.0 | sitecore-xp-standalone | windowsservercore | 1803 | `sitecore-xp-standalone:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-standalone/Dockerfile) |
-| 9.1.0 | sitecore-xp-sqldev | windowsservercore | 1803 | `sitecore-xp-sqldev:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect-indexworker | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-indexworker:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect-automationengine | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-automationengine:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect | windowsservercore | ltsc2019 | `sitecore-xp-xconnect:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.1.1 | sitecore-xp-standalone | windowsservercore | ltsc2019 | `sitecore-xp-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-cd | windowsservercore | ltsc2019 | `sitecore-xp-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-base | windowsservercore | ltsc2019 | `sitecore-xp-base:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.1.1 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.1.1-windowsservercore-ltsc2019` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-base/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect-indexworker | windowsservercore | 1903 | `sitecore-xp-xconnect-indexworker:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect-automationengine | windowsservercore | 1903 | `sitecore-xp-xconnect-automationengine:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.1.1 | sitecore-xp-xconnect | windowsservercore | 1903 | `sitecore-xp-xconnect:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.1.1 | sitecore-xp-standalone | windowsservercore | 1903 | `sitecore-xp-standalone:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-sqldev | windowsservercore | 1903 | `sitecore-xp-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-solr | nanoserver | 1903 | `sitecore-xp-solr:9.1.1-nanoserver-1903` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver/sitecore-xp-solr/Dockerfile) |
+| 9.1.1 | sitecore-xp-cd | windowsservercore | 1903 | `sitecore-xp-cd:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-base | windowsservercore | 1903 | `sitecore-xp-base:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sqldev | windowsservercore | 1903 | `sitecore-xm1-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-solr | nanoserver | 1903 | `sitecore-xm1-solr:9.1.1-nanoserver-1903` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver/sitecore-xm1-solr/Dockerfile) |
+| 9.1.1 | sitecore-xm1-cm | windowsservercore | 1903 | `sitecore-xm1-cm:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-cd | windowsservercore | 1903 | `sitecore-xm1-cd:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.1.1 | sitecore-base | windowsservercore | 1903 | `sitecore-base:9.1.1-windowsservercore-1903` [Dockerfile](images/9.1.1%20rev.%20002459/windowsservercore/sitecore-base/Dockerfile) |
+| 9.1.1 | sitecore-xp-solr | nanoserver | 1809 | `sitecore-xp-solr:9.1.1-nanoserver-1809` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver/sitecore-xp-solr/Dockerfile) |
+| 9.1.1 | sitecore-xm1-solr | nanoserver | 1809 | `sitecore-xm1-solr:9.1.1-nanoserver-1809` [Dockerfile](images/9.1.1%20rev.%20002459/nanoserver/sitecore-xm1-solr/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect-indexworker | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-indexworker:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect-automationengine | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-automationengine:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect | windowsservercore | ltsc2019 | `sitecore-xp-xconnect:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.1.0 | sitecore-xp-standalone | windowsservercore | ltsc2019 | `sitecore-xp-standalone:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.1.0 | sitecore-xp-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sqldev:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
+| 9.1.0 | sitecore-xp-cd | windowsservercore | ltsc2019 | `sitecore-xp-cd:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.1.0 | sitecore-xp-base | windowsservercore | ltsc2019 | `sitecore-xp-base:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.1.0 | sitecore-xm1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sqldev:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-sqldev/Dockerfile) |
+| 9.1.0 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.1.0 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.1.0 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.1.0-windowsservercore-ltsc2019` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-base/Dockerfile) |
+| 9.1.0 | sitecore-xp-solr | nanoserver | 1809 | `sitecore-xp-solr:9.1.0-nanoserver-1809` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver/sitecore-xp-solr/Dockerfile) |
+| 9.1.0 | sitecore-xm1-solr | nanoserver | 1809 | `sitecore-xm1-solr:9.1.0-nanoserver-1809` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver/sitecore-xm1-solr/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect-indexworker | windowsservercore | 1803 | `sitecore-xp-xconnect-indexworker:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect-automationengine | windowsservercore | 1803 | `sitecore-xp-xconnect-automationengine:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.1.0 | sitecore-xp-xconnect | windowsservercore | 1803 | `sitecore-xp-xconnect:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.1.0 | sitecore-xp-standalone | windowsservercore | 1803 | `sitecore-xp-standalone:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.1.0 | sitecore-xp-sqldev | windowsservercore | 1803 | `sitecore-xp-sqldev:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
 | 9.1.0 | sitecore-xp-solr | nanoserver | 1803 | `sitecore-xp-solr:9.1.0-nanoserver-1803` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver-1803/sitecore-xp-solr/Dockerfile) |
-| 9.1.0 | sitecore-xp-cd | windowsservercore | 1803 | `sitecore-xp-cd:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-cd/Dockerfile) |
-| 9.1.0 | sitecore-xp-base | windowsservercore | 1803 | `sitecore-xp-base:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xp-base/Dockerfile) |
-| 9.1.0 | sitecore-xm1-sqldev | windowsservercore | 1803 | `sitecore-xm1-sqldev:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xm1-sqldev/Dockerfile) |
+| 9.1.0 | sitecore-xp-cd | windowsservercore | 1803 | `sitecore-xp-cd:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.1.0 | sitecore-xp-base | windowsservercore | 1803 | `sitecore-xp-base:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.1.0 | sitecore-xm1-sqldev | windowsservercore | 1803 | `sitecore-xm1-sqldev:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-sqldev/Dockerfile) |
 | 9.1.0 | sitecore-xm1-solr | nanoserver | 1803 | `sitecore-xm1-solr:9.1.0-nanoserver-1803` [Dockerfile](images/9.1.0%20rev.%20001564/nanoserver-1803/sitecore-xm1-solr/Dockerfile) |
-| 9.1.0 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xm1-cm/Dockerfile) |
-| 9.1.0 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-xm1-cd/Dockerfile) |
-| 9.1.0 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore-1803/sitecore-base/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-xm1-cm/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-xm1-cd/Dockerfile) |
-| 9.0.180604 | sitecore-sqldev | windowsservercore | ltsc2019 | `sitecore-sqldev:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-sqldev/Dockerfile) |
-| 9.0.180604 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-ltsc2019/sitecore-base/Dockerfile) |
-| 9.0.180604 | sitecore-solr | nanoserver | 1809 | `sitecore-solr:9.0.180604-nanoserver-1809` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1809/sitecore-solr/Dockerfile) |
-| 9.0.180604 | sitecore-xp-xconnect-indexworker | windowsservercore | 1803 | `sitecore-xp-xconnect-indexworker:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-xconnect-indexworker/Dockerfile) |
-| 9.0.180604 | sitecore-xp-xconnect-automationengine | windowsservercore | 1803 | `sitecore-xp-xconnect-automationengine:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-xconnect-automationengine/Dockerfile) |
-| 9.0.180604 | sitecore-xp-xconnect | windowsservercore | 1803 | `sitecore-xp-xconnect:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-xconnect/Dockerfile) |
-| 9.0.180604 | sitecore-xp-standalone | windowsservercore | 1803 | `sitecore-xp-standalone:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-standalone/Dockerfile) |
-| 9.0.180604 | sitecore-xp-sqldev | windowsservercore | 1803 | `sitecore-xp-sqldev:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-sqldev/Dockerfile) |
-| 9.0.180604 | sitecore-xp-solr | nanoserver | 1803 | `sitecore-xp-solr:9.0.180604-nanoserver-1803` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1803/sitecore-xp-solr/Dockerfile) |
-| 9.0.180604 | sitecore-xp-cd | windowsservercore | 1803 | `sitecore-xp-cd:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-cd/Dockerfile) |
-| 9.0.180604 | sitecore-xp-base | windowsservercore | 1803 | `sitecore-xp-base:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xp-base/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xm1-cm/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-xm1-cd/Dockerfile) |
-| 9.0.180604 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-sqldev/Dockerfile) |
-| 9.0.180604 | sitecore-solr | nanoserver | 1803 | `sitecore-solr:9.0.180604-nanoserver-1803` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1803/sitecore-solr/Dockerfile) |
-| 9.0.180604 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1803/sitecore-base/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cm | windowsservercore | 1709 | `sitecore-xm1-cm:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1709/sitecore-xm1-cm/Dockerfile) |
-| 9.0.180604 | sitecore-xm1-cd | windowsservercore | 1709 | `sitecore-xm1-cd:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1709/sitecore-xm1-cd/Dockerfile) |
-| 9.0.180604 | sitecore-sqldev | windowsservercore | 1709 | `sitecore-sqldev:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1709/sitecore-sqldev/Dockerfile) |
-| 9.0.180604 | sitecore-solr | nanoserver | 1709 | `sitecore-solr:9.0.180604-nanoserver-1709` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1709/sitecore-solr/Dockerfile) |
-| 9.0.180604 | sitecore-base | windowsservercore | 1709 | `sitecore-base:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore-1709/sitecore-base/Dockerfile) |
-| 9.0.171219 | sitecore-sqldev | windowsservercore | ltsc2016 | `sitecore-sqldev:9.0.171219-windowsservercore-ltsc2016` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-ltsc2016/sitecore-sqldev/Dockerfile) |
-| 9.0.171219 | sitecore-solr | nanoserver | ltsc2016 | `sitecore-solr:9.0.171219-nanoserver-ltsc2016` [Dockerfile](images/9.0.1%20rev.%20171219/nanoserver-ltsc2016/sitecore-solr/Dockerfile) |
-| 9.0.171219 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1803/sitecore-xm1-cm/Dockerfile) |
-| 9.0.171219 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1803/sitecore-xm1-cd/Dockerfile) |
-| 9.0.171219 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1803/sitecore-sqldev/Dockerfile) |
-| 9.0.171219 | sitecore-solr | nanoserver | 1803 | `sitecore-solr:9.0.171219-nanoserver-1803` [Dockerfile](images/9.0.1%20rev.%20171219/nanoserver-1803/sitecore-solr/Dockerfile) |
-| 9.0.171219 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1803/sitecore-base/Dockerfile) |
-| 9.0.171219 | sitecore-xm1-cm | windowsservercore | 1709 | `sitecore-xm1-cm:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1709/sitecore-xm1-cm/Dockerfile) |
-| 9.0.171219 | sitecore-xm1-cd | windowsservercore | 1709 | `sitecore-xm1-cd:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1709/sitecore-xm1-cd/Dockerfile) |
-| 9.0.171219 | sitecore-sqldev | windowsservercore | 1709 | `sitecore-sqldev:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1709/sitecore-sqldev/Dockerfile) |
-| 9.0.171219 | sitecore-solr | nanoserver | 1709 | `sitecore-solr:9.0.171219-nanoserver-1709` [Dockerfile](images/9.0.1%20rev.%20171219/nanoserver-1709/sitecore-solr/Dockerfile) |
-| 9.0.171219 | sitecore-base | windowsservercore | 1709 | `sitecore-base:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore-1709/sitecore-base/Dockerfile) |
-| 9.0.171002 | sitecore-sqldev | windowsservercore | ltsc2016 | `sitecore-sqldev:9.0.171002-windowsservercore-ltsc2016` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore-ltsc2016/sitecore-sqldev/Dockerfile) |
-| 9.0.171002 | sitecore-xm1-cm | windowsservercore | 1709 | `sitecore-xm1-cm:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore-1709/sitecore-xm1-cm/Dockerfile) |
-| 9.0.171002 | sitecore-xm1-cd | windowsservercore | 1709 | `sitecore-xm1-cd:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore-1709/sitecore-xm1-cd/Dockerfile) |
-| 9.0.171002 | sitecore-base | windowsservercore | 1709 | `sitecore-base:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore-1709/sitecore-base/Dockerfile) |
-| 8.2.180406 | sitecore-sqldev | windowsservercore | ltsc2019 | `sitecore-sqldev:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore-sqldev/Dockerfile) |
-| 8.2.180406 | sitecore-reporting | windowsservercore | ltsc2019 | `sitecore-reporting:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore-reporting/Dockerfile) |
-| 8.2.180406 | sitecore-processing | windowsservercore | ltsc2019 | `sitecore-processing:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore-processing/Dockerfile) |
-| 8.2.180406 | sitecore-cm | windowsservercore | ltsc2019 | `sitecore-cm:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore-cm/Dockerfile) |
-| 8.2.180406 | sitecore-cd | windowsservercore | ltsc2019 | `sitecore-cd:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore-cd/Dockerfile) |
-| 8.2.180406 | sitecore | windowsservercore | ltsc2019 | `sitecore:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-ltsc2019/sitecore/Dockerfile) |
-| 8.2.180406 | sitecore-solr | nanoserver | 1809 | `sitecore-solr:8.2.180406-nanoserver-1809` [Dockerfile](images/8.2%20rev.%20180406/nanoserver-1809/sitecore-solr/Dockerfile) |
-| 8.2.180406 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore-sqldev/Dockerfile) |
+| 9.1.0 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.1.0 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.1.0 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.1.0-windowsservercore-1803` [Dockerfile](images/9.1.0%20rev.%20001564/windowsservercore/sitecore-base/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect-indexworker | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-indexworker:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect-automationengine | windowsservercore | ltsc2019 | `sitecore-xp-xconnect-automationengine:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect | windowsservercore | ltsc2019 | `sitecore-xp-xconnect:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.0.180604 | sitecore-xp-standalone | windowsservercore | ltsc2019 | `sitecore-xp-standalone:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.0.180604 | sitecore-xp-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sqldev:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
+| 9.0.180604 | sitecore-xp-cd | windowsservercore | ltsc2019 | `sitecore-xp-cd:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.0.180604 | sitecore-xp-base | windowsservercore | ltsc2019 | `sitecore-xp-base:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.0.180604 | sitecore-xm1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-cm:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.0.180604 | sitecore-xm1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-cd:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.0.180604 | sitecore-sqldev | windowsservercore | ltsc2019 | `sitecore-sqldev:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 9.0.180604 | sitecore-base | windowsservercore | ltsc2019 | `sitecore-base:9.0.180604-windowsservercore-ltsc2019` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-base/Dockerfile) |
+| 9.0.180604 | sitecore-xp-solr | nanoserver | 1809 | `sitecore-xp-solr:9.0.180604-nanoserver-1809` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver/sitecore-xp-solr/Dockerfile) |
+| 9.0.180604 | sitecore-solr | nanoserver | 1809 | `sitecore-solr:9.0.180604-nanoserver-1809` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver/sitecore-solr/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect-indexworker | windowsservercore | 1803 | `sitecore-xp-xconnect-indexworker:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect-indexworker/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect-automationengine | windowsservercore | 1803 | `sitecore-xp-xconnect-automationengine:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect-automationengine/Dockerfile) |
+| 9.0.180604 | sitecore-xp-xconnect | windowsservercore | 1803 | `sitecore-xp-xconnect:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-xconnect/Dockerfile) |
+| 9.0.180604 | sitecore-xp-standalone | windowsservercore | 1803 | `sitecore-xp-standalone:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-standalone/Dockerfile) |
+| 9.0.180604 | sitecore-xp-sqldev | windowsservercore | 1803 | `sitecore-xp-sqldev:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-sqldev/Dockerfile) |
+| 9.0.180604 | sitecore-xp-solr | nanoserver | 1803 | `sitecore-xp-solr:9.0.180604-nanoserver-1803` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1709-1803/sitecore-xp-solr/Dockerfile) |
+| 9.0.180604 | sitecore-xp-cd | windowsservercore | 1803 | `sitecore-xp-cd:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-cd/Dockerfile) |
+| 9.0.180604 | sitecore-xp-base | windowsservercore | 1803 | `sitecore-xp-base:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xp-base/Dockerfile) |
+| 9.0.180604 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.0.180604 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.0.180604 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 9.0.180604 | sitecore-solr | nanoserver | 1803 | `sitecore-solr:9.0.180604-nanoserver-1803` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1709-1803/sitecore-solr/Dockerfile) |
+| 9.0.180604 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.0.180604-windowsservercore-1803` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-base/Dockerfile) |
+| ~~9.0.180604~~ | ~~sitecore-xm1-cm~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cm:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cm/Dockerfile)~~ |
+| ~~9.0.180604~~ | ~~sitecore-xm1-cd~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cd:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-xm1-cd/Dockerfile)~~ |
+| ~~9.0.180604~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~9.0.180604~~ | ~~sitecore-solr~~ | ~~nanoserver~~ | ~~1709~~ | ~~`sitecore-solr:9.0.180604-nanoserver-1709` [Dockerfile](images/9.0.2%20rev.%20180604/nanoserver-1709-1803/sitecore-solr/Dockerfile)~~ |
+| ~~9.0.180604~~ | ~~sitecore-base~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-base:9.0.180604-windowsservercore-1709` [Dockerfile](images/9.0.2%20rev.%20180604/windowsservercore/sitecore-base/Dockerfile)~~ |
+| 9.0.171219 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.0.171219 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.0.171219 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 9.0.171219 | sitecore-solr | nanoserver | 1803 | `sitecore-solr:9.0.171219-nanoserver-1803` [Dockerfile](images/9.0.1%20rev.%20171219/nanoserver/sitecore-solr/Dockerfile) |
+| 9.0.171219 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.0.171219-windowsservercore-1803` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-base/Dockerfile) |
+| ~~9.0.171219~~ | ~~sitecore-xm1-cm~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cm:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-xm1-cm/Dockerfile)~~ |
+| ~~9.0.171219~~ | ~~sitecore-xm1-cd~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cd:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-xm1-cd/Dockerfile)~~ |
+| ~~9.0.171219~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~9.0.171219~~ | ~~sitecore-solr~~ | ~~nanoserver~~ | ~~1709~~ | ~~`sitecore-solr:9.0.171219-nanoserver-1709` [Dockerfile](images/9.0.1%20rev.%20171219/nanoserver/sitecore-solr/Dockerfile)~~ |
+| ~~9.0.171219~~ | ~~sitecore-base~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-base:9.0.171219-windowsservercore-1709` [Dockerfile](images/9.0.1%20rev.%20171219/windowsservercore/sitecore-base/Dockerfile)~~ |
+| 9.0.171002 | sitecore-xm1-cm | windowsservercore | 1803 | `sitecore-xm1-cm:9.0.171002-windowsservercore-1803` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-xm1-cm/Dockerfile) |
+| 9.0.171002 | sitecore-xm1-cd | windowsservercore | 1803 | `sitecore-xm1-cd:9.0.171002-windowsservercore-1803` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-xm1-cd/Dockerfile) |
+| 9.0.171002 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:9.0.171002-windowsservercore-1803` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 9.0.171002 | sitecore-base | windowsservercore | 1803 | `sitecore-base:9.0.171002-windowsservercore-1803` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-base/Dockerfile) |
+| ~~9.0.171002~~ | ~~sitecore-xm1-cm~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cm:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-xm1-cm/Dockerfile)~~ |
+| ~~9.0.171002~~ | ~~sitecore-xm1-cd~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-xm1-cd:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-xm1-cd/Dockerfile)~~ |
+| ~~9.0.171002~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~9.0.171002~~ | ~~sitecore-base~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-base:9.0.171002-windowsservercore-1709` [Dockerfile](images/9.0.0%20rev.%20171002/windowsservercore/sitecore-base/Dockerfile)~~ |
+| 8.2.180406 | sitecore-sqldev | windowsservercore | ltsc2019 | `sitecore-sqldev:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 8.2.180406 | sitecore-reporting | windowsservercore | ltsc2019 | `sitecore-reporting:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-reporting/Dockerfile) |
+| 8.2.180406 | sitecore-processing | windowsservercore | ltsc2019 | `sitecore-processing:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-processing/Dockerfile) |
+| 8.2.180406 | sitecore-cm | windowsservercore | ltsc2019 | `sitecore-cm:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-cm/Dockerfile) |
+| 8.2.180406 | sitecore-cd | windowsservercore | ltsc2019 | `sitecore-cd:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-cd/Dockerfile) |
+| 8.2.180406 | sitecore | windowsservercore | ltsc2019 | `sitecore:8.2.180406-windowsservercore-ltsc2019` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore/Dockerfile) |
+| 8.2.180406 | sitecore-solr | nanoserver | 1809 | `sitecore-solr:8.2.180406-nanoserver-1809` [Dockerfile](images/8.2%20rev.%20180406/nanoserver/sitecore-solr/Dockerfile) |
+| 8.2.180406 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-sqldev/Dockerfile) |
 | 8.2.180406 | sitecore-solr | nanoserver | 1803 | `sitecore-solr:8.2.180406-nanoserver-1803` [Dockerfile](images/8.2%20rev.%20180406/nanoserver-1803/sitecore-solr/Dockerfile) |
-| 8.2.180406 | sitecore-reporting | windowsservercore | 1803 | `sitecore-reporting:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore-reporting/Dockerfile) |
-| 8.2.180406 | sitecore-processing | windowsservercore | 1803 | `sitecore-processing:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore-processing/Dockerfile) |
-| 8.2.180406 | sitecore-cm | windowsservercore | 1803 | `sitecore-cm:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore-cm/Dockerfile) |
-| 8.2.180406 | sitecore-cd | windowsservercore | 1803 | `sitecore-cd:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore-cd/Dockerfile) |
-| 8.2.180406 | sitecore | windowsservercore | 1803 | `sitecore:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1803/sitecore/Dockerfile) |
-| 8.2.180406 | sitecore | windowsservercore | 1709 | `sitecore:8.2.180406-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore-1709/Dockerfile) |
-| 8.2.171121 | sitecore | windowsservercore | 1803 | `sitecore:8.2.171121-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20171121/windowsservercore-1803/Dockerfile) |
-| 8.2.171121 | sitecore | windowsservercore | 1709 | `sitecore:8.2.171121-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20171121/windowsservercore-1709/Dockerfile) |
-| 8.2.170728 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170728-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170728/windowsservercore-1803/Dockerfile) |
-| 8.2.170728 | sitecore | windowsservercore | 1709 | `sitecore:8.2.170728-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170728/windowsservercore-1709/Dockerfile) |
-| 8.2.170614 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.170614-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore-1803/sitecore-sqldev/Dockerfile) |
-| 8.2.170614 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170614-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore-1803/Sitecore/Dockerfile) |
-| 8.2.170614 | sitecore | windowsservercore | 1709 | `sitecore:8.2.170614-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore-1709/Dockerfile) |
-| 8.2.170407 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.170407-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore-1803/sitecore-sqldev/Dockerfile) |
-| 8.2.170407 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170407-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore-1803/Sitecore/Dockerfile) |
-| 8.2.170407 | sitecore | windowsservercore | 1709 | `sitecore:8.2.170407-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore-1709/Dockerfile) |
-| ~~8.2.161221~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore-sqldev:8.2.161221-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore-1803/sitecore-sqldev/Dockerfile)~~ |
-| ~~8.2.161221~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore:8.2.161221-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore-1803/sitecore/Dockerfile)~~ |
-| ~~8.2.161221~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:8.2.161221-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore-1709/sitecore-sqldev/Dockerfile)~~ |
-| ~~8.2.161221~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.161221-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore-1709/sitecore/Dockerfile)~~ |
-| 8 | sitecore-openjdk | nanoserver | 1903 | `sitecore-openjdk:8-nanoserver-1903` [Dockerfile](images/sitecore-openjdk/nanoserver-1903/Dockerfile) |
-| 8 | sitecore-openjdk | nanoserver | 1809 | `sitecore-openjdk:8-nanoserver-1809` [Dockerfile](images/sitecore-openjdk/nanoserver-1809/Dockerfile) |
-| 8 | sitecore-openjdk | nanoserver | 1803 | `sitecore-openjdk:8-nanoserver-1803` [Dockerfile](images/sitecore-openjdk/nanoserver-1803/Dockerfile) |
-| 8 | sitecore-openjdk | nanoserver | 1709 | `sitecore-openjdk:8-nanoserver-1709` [Dockerfile](images/sitecore-openjdk/nanoserver-1709/Dockerfile) |
-| ~~7.5.150212~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore-sqldev:7.5.150212-windowsservercore-1803` [Dockerfile](images/7.5%20rev.%20150212/windowsservercore-1803/sitecore-sqldev/Dockerfile)~~ |
-| ~~7.5.150212~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore:7.5.150212-windowsservercore-1803` [Dockerfile](images/7.5%20rev.%20150212/windowsservercore-1803/sitecore/Dockerfile)~~ |
-| 2017 | mssql-developer | windowsservercore | ltsc2019 | `mssql-developer:2017-windowsservercore-ltsc2019` [Dockerfile](images/mssql-developer-2017/windowsservercore-ltsc2019/Dockerfile) |
-| 2017 | mssql-developer | windowsservercore | 1903 | `mssql-developer:2017-windowsservercore-1903` [Dockerfile](images/mssql-developer-2017/windowsservercore-1903/Dockerfile) |
+| 8.2.180406 | sitecore-reporting | windowsservercore | 1803 | `sitecore-reporting:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-reporting/Dockerfile) |
+| 8.2.180406 | sitecore-processing | windowsservercore | 1803 | `sitecore-processing:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-processing/Dockerfile) |
+| 8.2.180406 | sitecore-cm | windowsservercore | 1803 | `sitecore-cm:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-cm/Dockerfile) |
+| 8.2.180406 | sitecore-cd | windowsservercore | 1803 | `sitecore-cd:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore-cd/Dockerfile) |
+| 8.2.180406 | sitecore | windowsservercore | 1803 | `sitecore:8.2.180406-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.180406~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.180406-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20180406/windowsservercore/sitecore/Dockerfile)~~ |
+| 8.2.171121 | sitecore | windowsservercore | 1803 | `sitecore:8.2.171121-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20171121/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.171121~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.171121-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20171121/windowsservercore/sitecore/Dockerfile)~~ |
+| 8.2.170728 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170728-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170728/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.170728~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.170728-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170728/windowsservercore/sitecore/Dockerfile)~~ |
+| 8.2.170614 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.170614-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 8.2.170614 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170614-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.170614~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:8.2.170614-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~8.2.170614~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.170614-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170614/windowsservercore/sitecore/Dockerfile)~~ |
+| 8.2.170407 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.170407-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 8.2.170407 | sitecore | windowsservercore | 1803 | `sitecore:8.2.170407-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.170407~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:8.2.170407-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~8.2.170407~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.170407-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20170407/windowsservercore/sitecore/Dockerfile)~~ |
+| 8.2.161221 | sitecore-sqldev | windowsservercore | 1803 | `sitecore-sqldev:8.2.161221-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore/sitecore-sqldev/Dockerfile) |
+| 8.2.161221 | sitecore | windowsservercore | 1803 | `sitecore:8.2.161221-windowsservercore-1803` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore/sitecore/Dockerfile) |
+| ~~8.2.161221~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore-sqldev:8.2.161221-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~8.2.161221~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`sitecore:8.2.161221-windowsservercore-1709` [Dockerfile](images/8.2%20rev.%20161221/windowsservercore/sitecore/Dockerfile)~~ |
+| 8 | sitecore-openjdk | nanoserver | 1903 | `sitecore-openjdk:8-nanoserver-1903` [Dockerfile](images/sitecore-openjdk/nanoserver/Dockerfile) |
+| 8 | sitecore-openjdk | nanoserver | 1809 | `sitecore-openjdk:8-nanoserver-1809` [Dockerfile](images/sitecore-openjdk/nanoserver/Dockerfile) |
+| 8 | sitecore-openjdk | nanoserver | 1803 | `sitecore-openjdk:8-nanoserver-1803` [Dockerfile](images/sitecore-openjdk/nanoserver/Dockerfile) |
+| ~~8~~ | ~~sitecore-openjdk~~ | ~~nanoserver~~ | ~~1709~~ | ~~`sitecore-openjdk:8-nanoserver-1709` [Dockerfile](images/sitecore-openjdk/nanoserver/Dockerfile)~~ |
+| ~~7.5.150212~~ | ~~sitecore-sqldev~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore-sqldev:7.5.150212-windowsservercore-1803` [Dockerfile](images/7.5%20rev.%20150212/windowsservercore/sitecore-sqldev/Dockerfile)~~ |
+| ~~7.5.150212~~ | ~~sitecore~~ | ~~windowsservercore~~ | ~~1803~~ | ~~`sitecore:7.5.150212-windowsservercore-1803` [Dockerfile](images/7.5%20rev.%20150212/windowsservercore/sitecore/Dockerfile)~~ |
+| 2017 | mssql-developer | windowsservercore | ltsc2019 | `mssql-developer:2017-windowsservercore-ltsc2019` [Dockerfile](images/mssql-developer-2017/windowsservercore/Dockerfile) |
+| 2017 | mssql-developer | windowsservercore | 1903 | `mssql-developer:2017-windowsservercore-1903` [Dockerfile](images/mssql-developer-2017/windowsservercore/Dockerfile) |
+| 2017 | mssql-developer | windowsservercore | 1803 | `mssql-developer:2017-windowsservercore-1803` [Dockerfile](images/mssql-developer-2017/windowsservercore/Dockerfile) |
+| ~~2017~~ | ~~mssql-developer~~ | ~~windowsservercore~~ | ~~1709~~ | ~~`mssql-developer:2017-windowsservercore-1709` [Dockerfile](images/mssql-developer-2017/windowsservercore/Dockerfile)~~ |
 
+[//]: # "end: current images"
 
 ## Current variants
 
-| Version | Repository | OS  | Build | Tag |
+[//]: # "start: current variants"
+
+| Version | Repository | OS  | Build      | Tag |
 | ------- | ---------- | --- | -----------| --- |
-| 9.1.1 | sitecore-xp-sxa-1.8.1-standalone | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-sxa-1.8.1-standalone/Dockerfile) |
-| 9.1.1 | sitecore-xp-sxa-1.8.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-sxa-1.8.1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xp-sxa-1.8.1-cd | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-sxa.1.8.1-cd/Dockerfile) |
-| 9.1.1 | sitecore-xp-pse-5.0-standalone | windowsservercore | ltsc2019 | `sitecore-xp-pse-5.0-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-pse-5.0-standalone/Dockerfile) |
-| 9.1.1 | sitecore-xp-pse-5.0-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-pse-5.0-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-pse-5.0-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xp-jss-11.0.1-standalone | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-jss-11.0.1-standalone/Dockerfile) |
-| 9.1.1 | sitecore-xp-jss-11.0.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-jss-11.0.1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xp-jss-11.0.1-cd | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xp-jss.11.0.1-cd/Dockerfile) |
-| 9.1.1 | sitecore-xm1-sxa-1.8.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-sxa-1.8.1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xm1-sxa-1.8.1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-sxa-1.8.1-cm/Dockerfile) |
-| 9.1.1 | sitecore-xm1-sxa-1.8.1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-sxa.1.8.1-cd/Dockerfile) |
-| 9.1.1 | sitecore-xm1-pse-5.0-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-pse-5.0-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-pse-5.0-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xm1-pse-5.0-cm | windowsservercore | ltsc2019 | `sitecore-xm1-pse-5.0-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-pse-5.0-cm/Dockerfile) |
-| 9.1.1 | sitecore-xm1-jss-11.0.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-jss-11.0.1-sqldev/Dockerfile) |
-| 9.1.1 | sitecore-xm1-jss-11.0.1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-jss-11.0.1-cm/Dockerfile) |
-| 9.1.1 | sitecore-xm1-jss-11.0.1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/ltsc2019/sitecore-xm1-jss.11.0.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-standalone | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa-1.8.1-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa-1.8.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-cd | windowsservercore | ltsc2019 | `sitecore-xp-sxa-1.8.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa.1.8.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-pse-5.0-standalone | windowsservercore | ltsc2019 | `sitecore-xp-pse-5.0-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xp-pse-5.0-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-pse-5.0-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-pse-5.0-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xp-pse-5.0-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-standalone | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-standalone:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss-11.0.1-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss-11.0.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-cd | windowsservercore | ltsc2019 | `sitecore-xp-jss-11.0.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss.11.0.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa-1.8.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa-1.8.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa-1.8.1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-sxa-1.8.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa.1.8.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xm1-pse-5.0-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-pse-5.0-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xm1-pse-5.0-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-pse-5.0-cm | windowsservercore | ltsc2019 | `sitecore-xm1-pse-5.0-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xm1-pse-5.0-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-sqldev | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-sqldev:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss-11.0.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-cm | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-cm:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss-11.0.1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-cd | windowsservercore | ltsc2019 | `sitecore-xm1-jss-11.0.1-cd:9.1.1-windowsservercore-ltsc2019` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss.11.0.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-standalone | windowsservercore | 1903 | `sitecore-xp-sxa-1.8.1-standalone:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa-1.8.1-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-sqldev | windowsservercore | 1903 | `sitecore-xp-sxa-1.8.1-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa-1.8.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-sxa-1.8.1-cd | windowsservercore | 1903 | `sitecore-xp-sxa-1.8.1-cd:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xp-sxa.1.8.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xp-pse-5.0-standalone | windowsservercore | 1903 | `sitecore-xp-pse-5.0-standalone:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xp-pse-5.0-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-pse-5.0-sqldev | windowsservercore | 1903 | `sitecore-xp-pse-5.0-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xp-pse-5.0-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-standalone | windowsservercore | 1903 | `sitecore-xp-jss-11.0.1-standalone:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss-11.0.1-standalone/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-sqldev | windowsservercore | 1903 | `sitecore-xp-jss-11.0.1-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss-11.0.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xp-jss-11.0.1-cd | windowsservercore | 1903 | `sitecore-xp-jss-11.0.1-cd:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xp-jss.11.0.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-cm | windowsservercore | 1903 | `sitecore-xm1-sxa-1.8.1-cm:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa-1.8.1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-sxa-1.8.1-cd | windowsservercore | 1903 | `sitecore-xm1-sxa-1.8.1-cd:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/sxa/sitecore-xm1-sxa.1.8.1-cd/Dockerfile) |
+| 9.1.1 | sitecore-xm1-pse-5.0-sqldev | windowsservercore | 1903 | `sitecore-xm1-pse-5.0-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xm1-pse-5.0-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-pse-5.0-cm | windowsservercore | 1903 | `sitecore-xm1-pse-5.0-cm:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/pse/sitecore-xm1-pse-5.0-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-sqldev | windowsservercore | 1903 | `sitecore-xm1-jss-11.0.1-sqldev:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss-11.0.1-sqldev/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-cm | windowsservercore | 1903 | `sitecore-xm1-jss-11.0.1-cm:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss-11.0.1-cm/Dockerfile) |
+| 9.1.1 | sitecore-xm1-jss-11.0.1-cd | windowsservercore | 1903 | `sitecore-xm1-jss-11.0.1-cd:9.1.1-windowsservercore-1903` [Dockerfile](variants/9.1.1/windowsservercore/jss/sitecore-xm1-jss.11.0.1-cd/Dockerfile) |
+
+[//]: # "end: current variants"
 
 ### Tags and Windows versions
 
